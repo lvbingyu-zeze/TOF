@@ -79,12 +79,12 @@ class GAV_ACO:
         self.best_history = []
         self.iteration_best_history = []
 
-        # External initial solution (from GM-CEO)
+        # External initial solution (from VR-HHO)
         self.initial_tour = None
 
     def setup(self, points: np.ndarray, base: np.ndarray, initial_tour: List[int] = None):
         """
-        Setup problem with optional initial solution from GM-CEO
+        Setup problem with optional initial solution from VR-HHO
         """
         self.base_idx = 0
         self.coords = np.vstack([base.reshape(1, -1), points])
@@ -109,12 +109,12 @@ class GAV_ACO:
         self.tau_matrix = np.ones((self.n_nodes, self.n_nodes)) * 0.1
         np.fill_diagonal(self.tau_matrix, 0)
 
-        # If initial tour provided, boost its pheromone (GM-CEO integration)
+        # If initial tour provided, boost its pheromone (VR-HHO integration)
         if initial_tour is not None:
             self._initialize_pheromone_from_tour(initial_tour)
 
     def _initialize_pheromone_from_tour(self, tour: List[int]):
-        """Use GM-CEO solution to initialize pheromone matrix"""
+        """Use VR-HHO solution to initialize pheromone matrix"""
         path = [self.base_idx] + tour + [self.base_idx]
         boost = 2.0
 
@@ -383,7 +383,7 @@ def generate_instance(n_points: int, area_size: float = 30.0, seed: int = 42):
 
 
 def generate_initial_solution(points: np.ndarray, base: np.ndarray) -> List[int]:
-    """Simulate GM-CEO initial solution (nearest neighbor heuristic)"""
+    """Simulate VR-HHO initial solution (nearest neighbor heuristic)"""
     coords = np.vstack([base.reshape(1, -1), points])
     n = len(coords)
     unvisited = set(range(1, n))
@@ -415,7 +415,7 @@ def main():
         points, base = generate_instance(n, area_size=30.0, seed=42)
         print(f"Region: 30km × 30km, Base: ({base[0]:.1f}, {base[1]:.1f})")
 
-        # Generate initial solution (simulating GM-CEO output)
+        # Generate initial solution (simulating VR-HHO output)
         initial_tour = generate_initial_solution(points, base)
         initial_length = sum(
             np.linalg.norm(
@@ -466,7 +466,7 @@ def main():
             path_xy = coords[path_idx]
             ax1.plot(path_xy[:, 0], path_xy[:, 1], 'orange', linewidth=2,
                      alpha=0.7, label=f'Initial (L={initial_length:.2f})')
-        ax1.set_title('Initial Solution (GM-CEO / NN)')
+        ax1.set_title('Initial Solution (VR-HHO / NN)')
         ax1.legend()
         ax1.grid(True, alpha=0.3)
         ax1.set_aspect('equal')
